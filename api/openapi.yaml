@@ -1,0 +1,315 @@
+openapi: 3.0.1
+info:
+  title: testing-step
+  version: v1
+servers:
+- url: /
+security:
+- oauth2: []
+paths:
+  /api/v1/steps/testing-step-v1/Ready/:
+    get:
+      operationId: testing-step-v1_GetReadySteps
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/testing-step-v1_Ready_StepDto'
+                type: array
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad Request
+      summary: Retrieve all 'Ready' 'testing-step-v1' steps
+      tags:
+      - Steps/testing-step-v1
+  /api/v1/steps/testing-step-v1/Completed/:
+    get:
+      operationId: testing-step-v1_GetCompletedSteps
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/testing-step-v1_Completed_StepDto'
+                type: array
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad Request
+      summary: Retrieve all 'Completed' 'testing-step-v1' steps
+      tags:
+      - Steps/testing-step-v1
+  /api/v1/steps/testing-step-v1/{id}/Completed/:
+    put:
+      operationId: testing-step-v1_MarkStepAsCompleted
+      parameters:
+      - description: The id of the step to update
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/testing-step-v1_Completed_Result'
+        description: The new state of the step
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/testing-step-v1_Completed_StepDto'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad Request
+      summary: Mark the specified 'testing-step-v1' step as 'Completed'
+      tags:
+      - Steps/testing-step-v1
+  /api/v1/steps/testing-step-v1/Failed/:
+    get:
+      operationId: testing-step-v1_GetFailedSteps
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/testing-step-v1_Failed_StepDto'
+                type: array
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad Request
+      summary: Retrieve all 'Failed' 'testing-step-v1' steps
+      tags:
+      - Steps/testing-step-v1
+  /api/v1/steps/testing-step-v1/{id}/Failed/:
+    put:
+      operationId: testing-step-v1_MarkStepAsFailed
+      parameters:
+      - description: The id of the step to update
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: uuid
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/testing-step-v1_Failed_Result'
+        description: The new state of the step
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/testing-step-v1_Failed_StepDto'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+          description: Bad Request
+      summary: Mark the specified 'testing-step-v1' step as 'Failed'
+      tags:
+      - Steps/testing-step-v1
+components:
+  schemas:
+    Base_StepDto:
+      additionalProperties: false
+      properties:
+        id:
+          format: uuid
+          type: string
+        key:
+          type: string
+        name:
+          type: string
+        jobId:
+          format: uuid
+          type: string
+        milestoneId:
+          format: uuid
+          type: string
+        dependedOnBy:
+          items:
+            type: string
+          type: array
+        dependsOn:
+          items:
+            type: string
+          type: array
+      required:
+      - dependedOnBy
+      - dependsOn
+      - id
+      - jobId
+      - key
+      - milestoneId
+      - name
+      type: object
+    ProblemDetails:
+      additionalProperties: {}
+      example:
+        instance: instance
+        detail: detail
+        type: type
+        title: title
+        status: 0
+      properties:
+        type:
+          nullable: true
+          type: string
+        title:
+          nullable: true
+          type: string
+        status:
+          format: int32
+          nullable: true
+          type: integer
+        detail:
+          nullable: true
+          type: string
+        instance:
+          nullable: true
+          type: string
+      type: object
+    StepStatus:
+      description: The status of a step (How far along is it in processing).
+      enum:
+      - New
+      - Ready
+      - InProgress
+      - Completed
+      - Cancelled
+      - Failed
+      type: string
+    StepType:
+      enum:
+      - testing-step-v1
+      type: string
+    testing-step-v1_Completed_Result:
+      additionalProperties: false
+      type: object
+    testing-step-v1_Completed_StepDto:
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/testing-step-v1_StepDto'
+      - additionalProperties: false
+        properties:
+          result:
+            $ref: '#/components/schemas/testing-step-v1_Completed_Result'
+        required:
+        - result
+        type: object
+      example:
+        result: null
+    testing-step-v1_Failed_Result:
+      additionalProperties: false
+      example:
+        error: error
+      properties:
+        error:
+          minLength: 1
+          title: error
+          type: string
+      required:
+      - error
+      type: object
+    testing-step-v1_Failed_StepDto:
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/testing-step-v1_StepDto'
+      - additionalProperties: false
+        properties:
+          result:
+            $ref: '#/components/schemas/testing-step-v1_Failed_Result'
+        required:
+        - result
+        type: object
+      example:
+        result:
+          error: error
+    testing-step-v1_Parameters:
+      additionalProperties:
+        type: string
+      type: object
+    testing-step-v1_Ready_StepDto:
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/testing-step-v1_StepDto'
+      - additionalProperties: false
+        properties:
+          result:
+            $ref: '#/components/schemas/testing_step_v1_Ready_StepDto_allOf_result'
+        required:
+        - result
+        type: object
+      example:
+        result: null
+    testing-step-v1_StepDto:
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/Base_StepDto'
+      - additionalProperties: false
+        properties:
+          stepType:
+            $ref: '#/components/schemas/testing-step-v1_StepType'
+          parameters:
+            $ref: '#/components/schemas/testing-step-v1_Parameters'
+          status:
+            $ref: '#/components/schemas/testing-step-v1_StepStatus'
+        required:
+        - parameters
+        - status
+        - stepType
+        type: object
+    testing-step-v1_StepStatus:
+      enum:
+      - Completed
+      - Failed
+      - Ready
+      type: string
+    testing-step-v1_StepType:
+      enum:
+      - testing-step-v1
+      type: string
+    testing_step_v1_Ready_StepDto_allOf_result:
+      nullable: true
+      type: object
+  securitySchemes:
+    oauth2:
+      flows:
+        clientCredentials:
+          scopes: {}
+          tokenUrl: https://identity-keycloak-test.dug.com/realms/dug-identity/protocol/openid-connect/token
+      type: oauth2
